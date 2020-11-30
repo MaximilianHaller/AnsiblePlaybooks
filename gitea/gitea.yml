@@ -1,0 +1,69 @@
+---
+ - name: Install and configure Mysql
+   hosts: gitea
+   tasks:
+   - name Ensure git is installed.
+     package:
+       name: git
+       state: present
+   - name: Ensure a git user is present
+     user:
+       name: git
+       shell: /bin/bash
+   - name: Ensure a dbadmin user with administrativ privileges is present.
+     user:
+       name: dbadmin
+       shell: /bin/bash
+       groups: wheel
+       append: yes
+   - name: Ensure that mysql is installed.
+     package:
+       name: mysql-server
+       state: present
+   - name: Ensure mysql is enabled and started.
+     systemd:
+       name: mysqld
+       state: started
+       enabled: yes
+   - name: Secure mysql installation.
+     debug:
+       msg: 'I have to add a mysql_secure_installation step'
+   - name: Ensure gitea user is present in mysql. (maybe some python msql libs must be present)
+     mysql_user:
+       name: gitea
+       password: gitea
+       state: present
+       login_user: root
+       login_password:  
+   - name: Ensure gitea database is present in mysql.
+     mysql_db:
+       name: giteadb
+       state: present 
+       collation: utf8mb4_unicode_ci
+       encoding: utf8mb4
+       login_user: root
+       login_password:
+   - name: Ensure the gitea user has all privileges on the gitea Database.
+     mysql_user:
+       name: gitea
+       login_user: root
+       login:passwort:
+   - name: Ennsure gitea packages are downloaded.
+     get_url:
+       url: https://dl.gitea.io/gitea/1.12.6/gitea-1.12.6-linux-amd64
+       dest: /temp/gitea
+   - name: Ensure the directory structure for gitea is set up correctly.
+     file:
+       path: /var/lib/gitea/{custom,data,log}
+       state: directory
+       owner: git
+       group: git
+       mode: 750
+   - name: same
+     file:
+       path: /etc/gitea
+       state: directory
+       owner: git
+       group: git
+       mode: 770
+   - name: Ensure gitea binary is at a global location
