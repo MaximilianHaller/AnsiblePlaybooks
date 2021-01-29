@@ -1,0 +1,13 @@
+---
+- name: Install and configure terminator
+  hosts: localhost
+  tasks:
+  - name: Ensure terminator is installed
+    apt:
+      name: terminator
+      state: latest
+    become: yes
+  - name: configure terminator
+    template:
+      src: config
+      dest: ~/.config/terminator/config
